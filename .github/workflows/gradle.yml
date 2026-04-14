@@ -14,11 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: 设置 JDK 17
+      - name: 设置 JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       
       - name: 验证 Gradle Wrapper 存在
         run: |
@@ -46,4 +46,4 @@ jobs:
         with:
           name: mod-jar
           path: build/libs/*.jar
-          if-no-files-found: error  # 如果没有找到文件则报错
+          if-no-files-found: error
