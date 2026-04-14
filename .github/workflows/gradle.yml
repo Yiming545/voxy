@@ -1,0 +1,49 @@
+name: Gradle 构建
+
+on:
+  push:
+分支: [ main, master ]
+标签: [ 'v*' ]
+  pull_request:
+分支: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 设置 JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: 验证 Gradle Wrapper 存在
+        run: |
+          if [ ! -f "gradlew" ]; then
+            echo "错误: gradlew 文件不存在！"
+            echo "请确保仓库中包含 gradlew 和 gradle/wrapper/ 目录"
+            exit 1
+          fi
+          echo "✓ Gradle Wrapper 存在"
+      
+      - name: 添加执行权限
+        run: chmod +x gradlew
+      
+      - name: 查看 Gradle 版本（调试用）
+        run: ./gradlew --version
+      
+      - name: 构建模组
+        run: ./gradlew clean build --no-daemon --stacktrace
+      
+      - name: 列出构建产物
+        run: ls -la build/libs/
+      
+      - name: 上传 JAR 文件
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-jar
+          path: build/libs/*.jar
+          if-no-files-found: error  # 如果没有找到文件则报错
