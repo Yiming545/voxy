@@ -5,8 +5,6 @@ on:
     branches:
       - main
       - master
-    tags:
-      - 'v*'
   pull_request:
     branches:
       - main
@@ -19,28 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: 设置 JDK 25
+      - name: 设置 JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '25'
+          java-version: '21'
       
-      - name: 验证 Gradle Wrapper
-        run: |
-          if [ ! -f "gradlew" ]; then
-            echo "错误: gradlew 文件不存在"
-            exit 1
-          fi
-          chmod +x gradlew
-      
-      - name: 查看 Gradle 版本
-        run: ./gradlew --version
+      - name: 添加执行权限
+        run: chmod +x gradlew
       
       - name: 构建模组
         run: ./gradlew clean build --no-daemon --stacktrace
-      
-      - name: 列出构建产物
-        run: ls -la build/libs/
       
       - name: 上传 JAR 文件
         uses: actions/upload-artifact@v4
