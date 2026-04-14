@@ -1,0 +1,45 @@
+# .github/workflows/build.yml
+name: 自动构建模组 # 工作流名称
+
+# 触发条件：当推送到 main/master 分支，或有人发起 Pull Request 时运行
+on:
+  push:
+分支: [ "main", "master" ]
+  pull_request:
+分支: [ "main", "master" ]
+  # 允许你从 GitHub 网页端手动触发构建
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # 使用 Ubuntu 环境，免费且高效
+
+    steps:
+      # 1. 拉取代码仓库
+      - name: 签出代码
+        uses: actions/checkout@v4
+
+      # 2. 设置 Java 环境
+      # 注意：Minecraft 1.18+ 需要 Java 17/21，1.17 需要 Java 16，旧版需要 Java 8
+      - name: 设置 JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # 推荐使用 Eclipse Temurin (原 AdoptOpenJDK)
+          java-version: '21'
+
+      # 3. 为 Gradle 添加执行权限 (仅 Linux/macOS 需要)
+      - name: 使 Gradle Wrapper 可执行
+        run: chmod +x ./gradlew
+
+      # 4. 执行构建
+      # 核心命令：清理并构建，/build/libs/ 下会生成 .jar 文件
+      - name: 使用 Gradle 构建模组
+        run: ./gradlew clean build
+
+      # 5. 上传构建产物 (JAR 文件)
+      # 你可以直接在 GitHub Actions 页面下载这些文件
+      - name: 上传 JAR 文件作为工作流产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: 模组文件 # 产物名称
+          path: build/libs/*.jar # 一般模组 JAR 在这里
